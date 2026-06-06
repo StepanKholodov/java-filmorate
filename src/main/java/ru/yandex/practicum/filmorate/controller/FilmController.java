@@ -1,7 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -11,26 +17,54 @@ import java.time.Month;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * REST-контроллер для работы с фильмами.
+ * Поддерживает операции получения списка, добавления и обновления.
+ * Основная валидация выполняется аннотациями Jakarta Bean Validation на модели
+ * {@link Film} при использовании {@code @Valid}; дополнительно контроллер проверяет,
+ * что дата релиза не раньше {@link #BIRTH_OF_CINEMA}.
+ * Данные хранятся в памяти приложения.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private static final LocalDate BIRTH_OF_CINEMA = LocalDate.of(1895, Month.DECEMBER, 28);
-    private static final int MAX_DESCRIPTION_LENGTH = 200;
 
+    /** Дата рождения кинематографа — минимально допустимая дата релиза. */
+    private static final LocalDate BIRTH_OF_CINEMA = LocalDate.of(1895, Month.DECEMBER, 28);
+
+    /** Хранилище фильмов в памяти приложения, ключ — идентификатор фильма. */
     private final Map<Long, Film> films = new HashMap<>();
 
+    /** Счётчик для выдачи уникальных идентификаторов фильмов. */
+    private final AtomicLong idCounter = new AtomicLong(0);
+
+    /**
+     * Возвращает все добавленные фильмы.
+     *
+     * @return коллекция всех фильмов
+     */
     @GetMapping
     public Collection<Film> findAll() {
         log.info("Вызван метод для получения всех фильмов");
         return films.values();
     }
 
+    /**
+     * Добавляет новый фильм. Поля проверяются Bean Validation,
+     * дата релиза дополнительно проверяется на ограничение по дате рождения кино.
+     * Идентификатор присваивается автоматически.
+     *
+     * @param newFilm данные нового фильма
+     * @return добавленный фильм с присвоенным идентификатором
+     * @throws ValidateException если дата релиза раньше {@link #BIRTH_OF_CINEMA}
+     */
     @PostMapping
-    public Film create(@RequestBody Film newFilm) {
+    public Film create(@Valid @RequestBody Film newFilm) {
         log.info("Вызван метод для добавления фильма: {}", newFilm);
-        validate(newFilm);
+        validateReleaseDate(newFilm);
 
         newFilm.setId(getNextId());
         films.put(newFilm.getId(), newFilm);
@@ -39,8 +73,17 @@ public class FilmController {
         return newFilm;
     }
 
+    /**
+     * Обновляет существующий фильм. Поля проверяются Bean Validation,
+     * дополнительно проверяется ограничение по дате релиза. Требуется указание id.
+     *
+     * @param newFilm обновлённые данные фильма
+     * @return обновлённый фильм
+     * @throws ValidateException если не указан id или дата релиза раньше {@link #BIRTH_OF_CINEMA}
+     * @throws NotFoundException если фильма с переданным id не существует
+     */
     @PutMapping
-    public Film update(@RequestBody Film newFilm) {
+    public Film update(@Valid @RequestBody Film newFilm) {
         log.info("Вызван метод для обновления существующего фильма: {}", newFilm);
         if (newFilm.getId() == null) {
             log.warn("Ошибка обновления фильма: id не указан");
@@ -52,41 +95,35 @@ public class FilmController {
             throw new NotFoundException("фильм с id = " + newFilm.getId() + " не найден");
         }
 
-        validate(newFilm);
+        validateReleaseDate(newFilm);
         films.put(newFilm.getId(), newFilm);
         log.info("Фильм с id = {} обновлён", newFilm.getId());
 
         return newFilm;
     }
 
-    private void validate(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            log.warn("Ошибка валидации: пустое название фильма");
-            throw new ValidateException("название фильма не может быть пустым");
-        }
-
-        if (film.getDescription() != null && film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-            log.warn("Ошибка валидации: описание длиннее {} символов", MAX_DESCRIPTION_LENGTH);
-            throw new ValidateException("максимальная длина описания — " + MAX_DESCRIPTION_LENGTH + " символов");
-        }
-
-        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(BIRTH_OF_CINEMA)) {
+    /**
+     * Проверяет, что дата релиза не раньше {@link #BIRTH_OF_CINEMA}.
+     * Это ограничение нестандартное и не выражается готовыми аннотациями Bean Validation,
+     * поэтому проверяется отдельно.
+     *
+     * @param film фильм, у которого проверяется дата релиза
+     * @throws ValidateException если дата релиза раньше дня рождения кинематографа
+     */
+    private void validateReleaseDate(Film film) {
+        if (film.getReleaseDate().isBefore(BIRTH_OF_CINEMA)) {
             log.warn("Ошибка валидации: некорректная дата релиза {}", film.getReleaseDate());
             throw new ValidateException("дата релиза не может быть раньше 28 декабря 1895 года");
         }
-
-        if (film.getDuration() == null || film.getDuration() <= 0) {
-            log.warn("Ошибка валидации: некорректная продолжительность {}", film.getDuration());
-            throw new ValidateException("продолжительность фильма должна быть положительным числом");
-        }
     }
 
+    /**
+     * Генерирует следующий уникальный идентификатор фильма
+     * с помощью атомарного счётчика.
+     *
+     * @return новый уникальный идентификатор
+     */
     private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+        return idCounter.incrementAndGet();
     }
 }
