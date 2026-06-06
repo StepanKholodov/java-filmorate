@@ -30,10 +30,14 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequestMapping("/users")
 public class UserController {
 
-    /** Хранилище пользователей в памяти приложения, ключ — идентификатор пользователя. */
+    /**
+     * Хранилище пользователей в памяти приложения, ключ — идентификатор пользователя.
+     */
     private final Map<Long, User> users = new HashMap<>();
 
-    /** Счётчик для выдачи уникальных идентификаторов пользователей. */
+    /**
+     * Счётчик для выдачи уникальных идентификаторов пользователей.
+     */
     private final AtomicLong idCounter = new AtomicLong(0);
 
     /**

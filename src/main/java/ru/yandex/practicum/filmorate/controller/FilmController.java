@@ -32,13 +32,19 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequestMapping("/films")
 public class FilmController {
 
-    /** Дата рождения кинематографа — минимально допустимая дата релиза. */
+    /**
+     * Дата рождения кинематографа — минимально допустимая дата релиза.
+     */
     private static final LocalDate BIRTH_OF_CINEMA = LocalDate.of(1895, Month.DECEMBER, 28);
 
-    /** Хранилище фильмов в памяти приложения, ключ — идентификатор фильма. */
+    /**
+     * Хранилище фильмов в памяти приложения, ключ — идентификатор фильма.
+     */
     private final Map<Long, Film> films = new HashMap<>();
 
-    /** Счётчик для выдачи уникальных идентификаторов фильмов. */
+    /**
+     * Счётчик для выдачи уникальных идентификаторов фильмов.
+     */
     private final AtomicLong idCounter = new AtomicLong(0);
 
     /**
