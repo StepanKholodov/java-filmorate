@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Модель данных пользователя.
@@ -53,4 +55,7 @@ public class User {
     @NotNull(message = "дата рождения должна быть указана")
     @PastOrPresent(message = "дата рождения не может быть в будущем")
     private LocalDate birthday;
+
+    private final Set<Long> friends = new HashSet<>();
+
 }
