@@ -74,8 +74,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     /**
      * {@inheritDoc}
-     * <p>Ранее проставленные лайки из существующей записи переносятся в обновлённую,
-     * чтобы PUT не сбрасывал состояние лайков.
+     * <p>Лайки управляются отдельными эндпоинтами и не принимаются в теле PUT-запроса:
+     * набор лайков обновлённой записи полностью берётся из существующего фильма,
+     * любые значения поля {@code likes} из запроса игнорируются.
      */
     @Override
     public Film modify(Film film) {
@@ -90,6 +91,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("фильм с id = " + film.getId() + " не найден");
         }
 
+        film.getLikes().clear();
         film.getLikes().addAll(existing.getLikes());
         films.put(film.getId(), film);
         log.info("Фильм с id = {} обновлён", film.getId());
