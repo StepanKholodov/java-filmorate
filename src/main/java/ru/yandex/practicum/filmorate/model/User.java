@@ -56,6 +56,10 @@ public class User {
     @PastOrPresent(message = "дата рождения не может быть в будущем")
     private LocalDate birthday;
 
+    /**
+     * Идентификаторы пользователей, состоящих в дружбе с данным пользователем.
+     * Связь дружбы двусторонняя: при добавлении друга идентификаторы заносятся в оба множества.
+     */
     private final Set<Long> friends = new HashSet<>();
 
 }

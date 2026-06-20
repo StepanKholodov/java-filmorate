@@ -11,9 +11,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Реализация {@link UserStorage}, хранящая пользователей в оперативной памяти приложения.
+ * Используется как Spring-бин с уникальным жизненным циклом приложения (singleton).
+ * Подходит для разработки и тестов; данные не сохраняются между перезапусками.
+ */
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
+
     /**
      * Хранилище пользователей в памяти приложения, ключ — идентификатор пользователя.
      */
@@ -24,11 +30,17 @@ public class InMemoryUserStorage implements UserStorage {
      */
     private final AtomicLong idCounter = new AtomicLong(0);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<User> getAll() {
         return users.values();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public User add(User user) {
         useLoginAsNameIfBlank(user);
@@ -37,6 +49,9 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public User findById(Long id) {
         User user = users.get(id);
@@ -47,6 +62,9 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(Long id) {
         if (!users.containsKey(id)) {
@@ -55,6 +73,12 @@ public class InMemoryUserStorage implements UserStorage {
         users.remove(id);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Если имя в обновляемых данных пустое, в качестве имени подставляется логин.
+     * Ранее добавленные друзья из существующей записи переносятся в обновлённую,
+     * чтобы PUT не сбрасывал список друзей.
+     */
     @Override
     public User modify(User user) {
         log.info("Вызван метод для обновления пользователя: {}", user);
@@ -85,6 +109,7 @@ public class InMemoryUserStorage implements UserStorage {
     private long getNextId() {
         return idCounter.incrementAndGet();
     }
+
     /**
      * Если у пользователя не задано имя для отображения,
      * подставляет в него логин.
@@ -97,6 +122,4 @@ public class InMemoryUserStorage implements UserStorage {
             user.setName(user.getLogin());
         }
     }
-
 }
-

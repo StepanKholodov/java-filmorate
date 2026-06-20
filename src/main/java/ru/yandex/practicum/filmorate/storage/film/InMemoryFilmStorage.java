@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Реализация {@link FilmStorage}, хранящая фильмы в оперативной памяти приложения.
+ * Используется как Spring-бин с уникальным жизненным циклом приложения (singleton).
+ * Подходит для разработки и тестов; данные не сохраняются между перезапусками.
+ */
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -25,6 +30,9 @@ public class InMemoryFilmStorage implements FilmStorage {
      */
     private final AtomicLong idCounter = new AtomicLong(0);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Film add(Film film) {
         film.setId(getNextId());
@@ -32,11 +40,17 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<Film> getAll() {
         return films.values();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Film findById(Long id) {
         Film film = films.get(id);
@@ -47,15 +61,22 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(Long id) {
         if (!films.containsKey(id)) {
             throw new NotFoundException("Фильм с таким id не найден");
         }
         films.remove(id);
-
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Ранее проставленные лайки из существующей записи переносятся в обновлённую,
+     * чтобы PUT не сбрасывал состояние лайков.
+     */
     @Override
     public Film modify(Film film) {
         if (film.getId() == null) {
@@ -86,4 +107,3 @@ public class InMemoryFilmStorage implements FilmStorage {
         return idCounter.incrementAndGet();
     }
 }
-
