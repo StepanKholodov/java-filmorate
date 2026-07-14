@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller.error;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,18 +63,35 @@ public class ErrorHandler {
     }
 
     /**
+     * Обрабатывает нарушения ограничений целостности данных (например,
+     * уникальности email/login), которые доходят из хранилища как
+     * {@link DataIntegrityViolationException}. Исходное сообщение СУБД
+     * в ответ клиенту не попадает — оно пишется только в лог.
+     *
+     * @param e исключение нарушения целостности данных
+     * @return ответ со статусом 409 и обобщённым описанием причины
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDataIntegrityViolation(final DataIntegrityViolationException e) {
+        log.warn("Нарушено ограничение целостности данных", e);
+        return new ErrorResponse("данные нарушают ограничение уникальности или связности");
+    }
+
+    /**
      * Обрабатывает прочие непредвиденные исключения,
      * не покрытые специализированными обработчиками выше.
-     * Стектрейс пишется в лог, чтобы причину 500-й ошибки можно было найти
-     * даже когда клиенту отдаётся только краткое сообщение.
+     * Стектрейс пишется в лог, чтобы причину 500-й ошибки можно было найти;
+     * клиенту при этом отдаётся обобщённое сообщение, не раскрывающее
+     * внутренние детали реализации (текст исключения, имена классов и т.п.).
      *
      * @param e любое необработанное исключение
-     * @return ответ со статусом 500 и описанием ошибки
+     * @return ответ со статусом 500 и обобщённым описанием ошибки
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleAny(final Exception e) {
         log.error("Непредвиденная ошибка при обработке запроса", e);
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("внутренняя ошибка сервера");
     }
 }
