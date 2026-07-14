@@ -15,6 +15,14 @@ import java.sql.SQLException;
  */
 public class FilmRowMapper implements RowMapper<Film> {
 
+    /**
+     * Собирает {@link Film} из текущей строки результата запроса.
+     *
+     * @param rs     результат запроса, установленный на нужную строку
+     * @param rowNum номер строки (не используется)
+     * @return фильм с заполненными собственными полями и рейтингом MPA
+     * @throws SQLException если чтение данных из результата запроса завершилось ошибкой
+     */
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Film film = new Film();

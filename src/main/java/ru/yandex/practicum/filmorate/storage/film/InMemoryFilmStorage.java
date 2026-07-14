@@ -8,9 +8,12 @@ import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Реализация {@link FilmStorage}, хранящая фильмы в оперативной памяти приложения.
@@ -115,6 +118,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void removeLike(Long filmId, Long userId) {
         findById(filmId).getLikes().remove(userId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Film> getPopular(int count) {
+        return films.values().stream()
+                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     /**

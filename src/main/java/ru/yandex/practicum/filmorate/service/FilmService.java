@@ -15,11 +15,9 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Сервис, инкапсулирующий бизнес-логику над фильмами:
@@ -151,10 +149,7 @@ public class FilmService {
         if (count <= 0) {
             throw new ValidateException("count должен быть положительным числом");
         }
-        return filmStorage.getAll().stream()
-                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopular(count);
     }
 
     /**
@@ -182,10 +177,8 @@ public class FilmService {
     private void resolveMpaAndGenres(Film film) {
         film.setMpa(mpaStorage.findById(film.getMpa().getId()));
 
-        Set<Genre> resolvedGenres = new LinkedHashSet<>();
-        for (Genre genre : film.getGenres()) {
-            resolvedGenres.add(genreStorage.findById(genre.getId()));
-        }
+        List<Long> genreIds = film.getGenres().stream().map(Genre::getId).distinct().toList();
+        Set<Genre> resolvedGenres = new LinkedHashSet<>(genreStorage.findAllByIds(genreIds));
         film.getGenres().clear();
         film.getGenres().addAll(resolvedGenres);
     }

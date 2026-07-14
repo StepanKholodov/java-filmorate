@@ -20,6 +20,9 @@ public class InMemoryMpaStorage implements MpaStorage {
 
     private final Map<Long, Mpa> ratings = new LinkedHashMap<>();
 
+    /**
+     * Заполняет справочник фиксированным набором рейтингов системы MPAA.
+     */
     public InMemoryMpaStorage() {
         addRating(1L, "G");
         addRating(2L, "PG");
@@ -28,11 +31,17 @@ public class InMemoryMpaStorage implements MpaStorage {
         addRating(5L, "NC-17");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<Mpa> getAll() {
         return ratings.values();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Mpa findById(Long id) {
         Mpa mpa = ratings.get(id);
@@ -42,6 +51,12 @@ public class InMemoryMpaStorage implements MpaStorage {
         return mpa;
     }
 
+    /**
+     * Создаёт рейтинг с заданными идентификатором и названием и добавляет его в справочник.
+     *
+     * @param id   идентификатор рейтинга
+     * @param name название рейтинга
+     */
     private void addRating(Long id, String name) {
         Mpa mpa = new Mpa();
         mpa.setId(id);

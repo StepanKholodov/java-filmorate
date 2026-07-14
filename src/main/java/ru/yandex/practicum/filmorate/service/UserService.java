@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Сервис, инкапсулирующий бизнес-логику над пользователями:
@@ -105,9 +104,7 @@ public class UserService {
      */
     public List<User> getFriends(long userId) {
         User user = userStorage.findById(userId);
-        return user.getFriends().stream()
-                .map(userStorage::findById)
-                .collect(Collectors.toList());
+        return userStorage.findAllByIds(user.getFriends());
     }
 
     /**
@@ -124,8 +121,6 @@ public class UserService {
         User other = userStorage.findById(otherUserId);
         Set<Long> commonIds = new HashSet<>(user.getFriends());
         commonIds.retainAll(other.getFriends());
-        return commonIds.stream()
-                .map(userStorage::findById)
-                .collect(Collectors.toList());
+        return userStorage.findAllByIds(commonIds);
     }
 }

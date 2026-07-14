@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller.error;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  * Преобразует доменные исключения и ошибки Bean Validation
  * в соответствующие HTTP-ответы с описанием причины.
  */
+@Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
 
@@ -62,13 +64,16 @@ public class ErrorHandler {
     /**
      * Обрабатывает прочие непредвиденные исключения,
      * не покрытые специализированными обработчиками выше.
+     * Стектрейс пишется в лог, чтобы причину 500-й ошибки можно было найти
+     * даже когда клиенту отдаётся только краткое сообщение.
      *
      * @param e любое необработанное исключение
      * @return ответ со статусом 500 и описанием ошибки
      */
-    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleAny(final Throwable e) {
+    public ErrorResponse handleAny(final Exception e) {
+        log.error("Непредвиденная ошибка при обработке запроса", e);
         return new ErrorResponse(e.getMessage());
     }
 }

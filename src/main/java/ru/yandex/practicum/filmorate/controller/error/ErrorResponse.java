@@ -9,5 +9,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ErrorResponse {
+
+    /**
+     * Текст сообщения об ошибке, отправляемый клиенту в теле ответа.
+     */
     private final String error;
 }

@@ -25,11 +25,17 @@ public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<Mpa> getAll() {
         return jdbcTemplate.query(FIND_ALL_MPA, new MpaRowMapper());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Mpa findById(Long id) {
         try {

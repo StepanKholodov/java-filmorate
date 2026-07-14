@@ -7,8 +7,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -120,6 +122,21 @@ public class InMemoryUserStorage implements UserStorage {
         User user = findById(userId);
         findById(friendId);
         user.getFriends().remove(friendId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<User> findAllByIds(Collection<Long> ids) {
+        List<User> result = new ArrayList<>();
+        for (Long id : ids) {
+            User user = users.get(id);
+            if (user != null) {
+                result.add(user);
+            }
+        }
+        return result;
     }
 
     /**

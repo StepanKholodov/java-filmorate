@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Контракт хранилища пользователей.
@@ -72,4 +73,14 @@ public interface UserStorage {
      * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
      */
     void removeFriend(Long userId, Long friendId);
+
+    /**
+     * Возвращает пользователей по набору идентификаторов одним обращением к хранилищу,
+     * вместо поочерёдного вызова {@link #findById(Long)} для каждого идентификатора.
+     * Идентификаторы, для которых пользователь не найден, в результате просто отсутствуют.
+     *
+     * @param ids идентификаторы искомых пользователей
+     * @return найденные пользователи (порядок не гарантирован)
+     */
+    List<User> findAllByIds(Collection<Long> ids);
 }

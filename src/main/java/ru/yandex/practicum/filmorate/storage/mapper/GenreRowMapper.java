@@ -11,6 +11,14 @@ import java.sql.SQLException;
  */
 public class GenreRowMapper implements RowMapper<Genre> {
 
+    /**
+     * Собирает {@link Genre} из текущей строки результата запроса.
+     *
+     * @param rs     результат запроса, установленный на нужную строку
+     * @param rowNum номер строки (не используется)
+     * @return жанр с заполненными полями
+     * @throws SQLException если чтение данных из результата запроса завершилось ошибкой
+     */
     @Override
     public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
         Genre genre = new Genre();

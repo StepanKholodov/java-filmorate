@@ -11,6 +11,14 @@ import java.sql.SQLException;
  */
 public class MpaRowMapper implements RowMapper<Mpa> {
 
+    /**
+     * Собирает {@link Mpa} из текущей строки результата запроса.
+     *
+     * @param rs     результат запроса, установленный на нужную строку
+     * @param rowNum номер строки (не используется)
+     * @return рейтинг с заполненными полями
+     * @throws SQLException если чтение данных из результата запроса завершилось ошибкой
+     */
     @Override
     public Mpa mapRow(ResultSet rs, int rowNum) throws SQLException {
         Mpa mpa = new Mpa();

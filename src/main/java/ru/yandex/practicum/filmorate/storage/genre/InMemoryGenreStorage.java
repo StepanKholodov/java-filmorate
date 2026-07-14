@@ -5,8 +5,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +22,9 @@ public class InMemoryGenreStorage implements GenreStorage {
 
     private final Map<Long, Genre> genres = new LinkedHashMap<>();
 
+    /**
+     * Заполняет справочник фиксированным набором жанров.
+     */
     public InMemoryGenreStorage() {
         addGenre(1L, "Комедия");
         addGenre(2L, "Драма");
@@ -29,11 +34,17 @@ public class InMemoryGenreStorage implements GenreStorage {
         addGenre(6L, "Боевик");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<Genre> getAll() {
         return genres.values();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Genre findById(Long id) {
         Genre genre = genres.get(id);
@@ -43,6 +54,24 @@ public class InMemoryGenreStorage implements GenreStorage {
         return genre;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Genre> findAllByIds(Collection<Long> ids) {
+        List<Genre> result = new ArrayList<>();
+        for (Long id : ids) {
+            result.add(findById(id));
+        }
+        return result;
+    }
+
+    /**
+     * Создаёт жанр с заданными идентификатором и названием и добавляет его в справочник.
+     *
+     * @param id   идентификатор жанра
+     * @param name название жанра
+     */
     private void addGenre(Long id, String name) {
         Genre genre = new Genre();
         genre.setId(id);

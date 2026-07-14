@@ -29,8 +29,7 @@ class UserControllerTest {
     private UserController controller;
 
     @BeforeEach
-    void setUp()
-    {
+    void setUp() {
         InMemoryUserStorage userStorage = new InMemoryUserStorage();
         UserService userService = new UserService(userStorage);
         controller = new UserController(userService);

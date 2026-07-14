@@ -14,6 +14,14 @@ import java.sql.SQLException;
  */
 public class UserRowMapper implements RowMapper<User> {
 
+    /**
+     * Собирает {@link User} из текущей строки результата запроса.
+     *
+     * @param rs     результат запроса, установленный на нужную строку
+     * @param rowNum номер строки (не используется)
+     * @return пользователь с заполненными собственными полями
+     * @throws SQLException если чтение данных из результата запроса завершилось ошибкой
+     */
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         User user = new User();
