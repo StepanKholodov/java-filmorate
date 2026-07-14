@@ -29,7 +29,8 @@ class UserControllerTest {
     private UserController controller;
 
     @BeforeEach
-    void setUp() {
+    void setUp()
+    {
         InMemoryUserStorage userStorage = new InMemoryUserStorage();
         UserService userService = new UserService(userStorage);
         controller = new UserController(userService);
@@ -116,12 +117,17 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("addFriend: дружба становится двусторонней")
-    void addFriendIsBidirectional() {
+    @DisplayName("addFriend: дружба односторонняя — получатель не получает отправителя в друзья")
+    void addFriendIsOneDirectional() {
         User a = controller.create(userWithLogin("a"));
         User b = controller.create(userWithLogin("b"));
 
         controller.addFriend(a.getId(), b.getId());
+
+        assertTrue(controller.getUser(a.getId()).getFriends().contains(b.getId()));
+        assertTrue(controller.getUser(b.getId()).getFriends().isEmpty());
+
+        controller.addFriend(b.getId(), a.getId());
 
         assertTrue(controller.getUser(a.getId()).getFriends().contains(b.getId()));
         assertTrue(controller.getUser(b.getId()).getFriends().contains(a.getId()));
@@ -136,8 +142,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("removeFriend: связь снимается у обоих пользователей")
-    void removeFriendRemovesBothSides() {
+    @DisplayName("removeFriend: связь снимается только у инициатора")
+    void removeFriendRemovesOnlyInitiatorSide() {
         User a = controller.create(userWithLogin("a"));
         User b = controller.create(userWithLogin("b"));
         controller.addFriend(a.getId(), b.getId());

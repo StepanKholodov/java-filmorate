@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
@@ -17,7 +18,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Подходит для разработки и тестов; данные не сохраняются между перезапусками.
  */
 @Slf4j
-@Component
+@Component("inMemoryUserStorage")
+@Qualifier("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
 
     /**
@@ -98,6 +100,26 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("Пользователь с id = {} обновлён", user.getId());
 
         return user;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+        User user = findById(userId);
+        findById(friendId);
+        user.getFriends().add(friendId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeFriend(Long userId, Long friendId) {
+        User user = findById(userId);
+        findById(friendId);
+        user.getFriends().remove(friendId);
     }
 
     /**

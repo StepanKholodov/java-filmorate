@@ -1,12 +1,13 @@
-package ru.yandex.practicum.filmorate.exception;
+package ru.yandex.practicum.filmorate.controller.error;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidateException;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -24,9 +25,9 @@ public class ErrorHandler {
      * @return ответ со статусом 400 и описанием ошибки
      */
     @ExceptionHandler(ValidateException.class)
-    public ResponseEntity<Map<String, String>> handleValidate(ValidateException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", e.getMessage()));
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidate(final ValidateException e) {
+        return new ErrorResponse(e.getMessage());
     }
 
     /**
@@ -38,12 +39,12 @@ public class ErrorHandler {
      * @return ответ со статусом 400 и описанием всех ошибок валидации
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleBeanValidation(MethodArgumentNotValidException e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBeanValidation(final MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", message));
+        return  new ErrorResponse(message);
     }
 
     /**
@@ -53,9 +54,9 @@ public class ErrorHandler {
      * @return ответ со статусом 404 и описанием ошибки
      */
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", e.getMessage()));
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFound(NotFoundException e) {
+        return new ErrorResponse(e.getMessage());
     }
 
     /**
@@ -66,8 +67,8 @@ public class ErrorHandler {
      * @return ответ со статусом 500 и описанием ошибки
      */
     @ExceptionHandler(Throwable.class)
-    public ResponseEntity<Map<String, String>> handleAny(Throwable e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", e.getMessage()));
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleAny(final Throwable e) {
+        return new ErrorResponse(e.getMessage());
     }
 }

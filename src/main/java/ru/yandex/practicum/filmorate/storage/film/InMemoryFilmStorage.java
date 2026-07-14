@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
@@ -17,7 +18,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Подходит для разработки и тестов; данные не сохраняются между перезапусками.
  */
 @Slf4j
-@Component
+@Component("inMemoryFilmStorage")
+@Qualifier("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
     /**
@@ -97,6 +99,22 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Фильм с id = {} обновлён", film.getId());
 
         return film;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        findById(filmId).getLikes().add(userId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeLike(Long filmId, Long userId) {
+        findById(filmId).getLikes().remove(userId);
     }
 
     /**

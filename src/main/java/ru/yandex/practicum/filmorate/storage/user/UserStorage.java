@@ -53,4 +53,23 @@ public interface UserStorage {
      * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если пользователь не найден
      */
     User findById(Long id);
+
+    /**
+     * Добавляет пользователя {@code friendId} в список друзей пользователя {@code userId}.
+     * Связь односторонняя: у {@code friendId} пользователь {@code userId} в друзья не добавляется.
+     *
+     * @param userId   идентификатор пользователя, инициирующего добавление
+     * @param friendId идентификатор добавляемого в друзья пользователя
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
+     */
+    void addFriend(Long userId, Long friendId);
+
+    /**
+     * Удаляет пользователя {@code friendId} из списка друзей пользователя {@code userId}.
+     *
+     * @param userId   идентификатор пользователя, из чьего списка удаляют друга
+     * @param friendId идентификатор удаляемого из друзей пользователя
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
+     */
+    void removeFriend(Long userId, Long friendId);
 }

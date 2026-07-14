@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 720" width="1560" height="720" font-family="Helvetica, Arial, sans-serif">
+<defs>
+<style>
+  .table-box { fill: #ffffff; stroke: #33415c; stroke-width: 1.6; }
+  .table-header { fill: #33415c; }
+  .header-rule { stroke: #33415c; stroke-width: 1.6; }
+  .table-title { fill: #ffffff; font-weight: 700; font-size: 16px; font-family: Consolas, 'Courier New', monospace; }
+  .row-alt { fill: #f2f5fa; }
+  .col-pk { fill: #0b3d91; font-weight: 700; font-size: 13px; font-family: Consolas, 'Courier New', monospace; }
+  .col-name { fill: #1a1a1a; font-size: 13px; font-family: Consolas, 'Courier New', monospace; }
+  .col-type { fill: #5a6472; font-size: 11.5px; font-family: Consolas, 'Courier New', monospace; }
+  .rel-line { stroke: #8a94a6; stroke-width: 2; fill: none; }
+  .rel-dot { fill: #33415c; }
+  .rel-label { fill: #b8482e; font-size: 12px; font-weight: 700; font-family: Consolas, 'Courier New', monospace; }
+  .mid-label { fill: #33415c; font-size: 12px; font-weight: 700; font-family: Consolas, 'Courier New', monospace; }
+  .mid-label-bg { fill: #fbfcfe; }
+  .diagram-title { fill: #1a1a1a; font-size: 24px; font-weight: 700; font-family: Helvetica, Arial, sans-serif; }
+</style>
+</defs>
+<rect x="0" y="0" width="1560" height="720" fill="#fbfcfe"/>
+<text x="780.0" y="30" text-anchor="middle" class="diagram-title">Filmorate — ER-diagram</text>
+<path d="M 360 87.0 L 380 87.0 L 380 367.0 L 40 367.0" class="rel-line"/>
+<circle cx="360" cy="87.0" r="3.2" class="rel-dot"/>
+<circle cx="40" cy="367.0" r="3.2" class="rel-dot"/>
+<text x="380.0" y="81.0" class="rel-label">1</text>
+<text x="60.0" y="361.0" class="rel-label">N</text>
+<rect x="384.0" y="137.8" width="60.4" height="16" class="mid-label-bg"/>
+<text x="388.0" y="149.8" text-anchor="start" class="mid-label">user_id</text><path d="M 360 87.0 L 410 87.0 L 410 393.0 L 40 393.0" class="rel-line"/>
+<circle cx="360" cy="87.0" r="3.2" class="rel-dot"/>
+<circle cx="40" cy="393.0" r="3.2" class="rel-dot"/>
+<text x="380.0" y="81.0" class="rel-label">1</text>
+<text x="60.0" y="387.0" class="rel-label">N</text>
+<rect x="414.0" y="195.28" width="74.8" height="16" class="mid-label-bg"/>
+<text x="418.0" y="207.28" text-anchor="start" class="mid-label">friend_id</text><path d="M 360 87.0 L 430 87.0 L 430 393.0 L 440 393.0" class="rel-line"/>
+<circle cx="360" cy="87.0" r="3.2" class="rel-dot"/>
+<circle cx="440" cy="393.0" r="3.2" class="rel-dot"/>
+<text x="380.0" y="81.0" class="rel-label">1</text>
+<text x="432.0" y="387.0" class="rel-label">N</text>
+<rect x="434.0" y="253.41999999999996" width="60.4" height="16" class="mid-label-bg"/>
+<text x="438.0" y="265.41999999999996" text-anchor="start" class="mid-label">user_id</text><path d="M 264.0 432 L 264.0 590" class="rel-line"/>
+<circle cx="264.0" cy="432" r="3.2" class="rel-dot"/>
+<circle cx="264.0" cy="590" r="3.2" class="rel-dot"/>
+<text x="270.0" y="440.0" class="rel-label">N</text>
+<text x="270.0" y="570.0" class="rel-label">1</text>
+<rect x="268.0" y="503.0" width="74.8" height="16" class="mid-label-bg"/>
+<text x="272.0" y="515.0" text-anchor="start" class="mid-label">status_id</text><path d="M 780 87.0 L 740 87.0 L 740 367.0 L 700 367.0" class="rel-line"/>
+<circle cx="780" cy="87.0" r="3.2" class="rel-dot"/>
+<circle cx="700" cy="367.0" r="3.2" class="rel-dot"/>
+<text x="772.0" y="81.0" class="rel-label">1</text>
+<text x="720.0" y="361.0" class="rel-label">N</text>
+<rect x="713.8" y="71.0" width="60.4" height="16" class="mid-label-bg"/>
+<text x="744.0" y="83.0" text-anchor="middle" class="mid-label">film_id</text><path d="M 1100 87.0 L 1130 87.0 L 1130 367.0 L 1100 367.0" class="rel-line"/>
+<circle cx="1100" cy="87.0" r="3.2" class="rel-dot"/>
+<circle cx="1100" cy="367.0" r="3.2" class="rel-dot"/>
+<text x="1120.0" y="81.0" class="rel-label">1</text>
+<text x="1120.0" y="361.0" class="rel-label">N</text>
+<rect x="1134.0" y="177.0" width="60.4" height="16" class="mid-label-bg"/>
+<text x="1138.0" y="189.0" text-anchor="start" class="mid-label">film_id</text><path d="M 1100 217.0 L 1200 217.0 L 1200 87.0 L 1260 87.0" class="rel-line"/>
+<circle cx="1100" cy="217.0" r="3.2" class="rel-dot"/>
+<circle cx="1260" cy="87.0" r="3.2" class="rel-dot"/>
+<text x="1120.0" y="211.0" class="rel-label">N</text>
+<text x="1252.0" y="81.0" class="rel-label">1</text>
+<rect x="1204.0" y="144.0" width="53.2" height="16" class="mid-label-bg"/>
+<text x="1208.0" y="156.0" text-anchor="start" class="mid-label">mpa_id</text><path d="M 1260 367.0 L 1180 367.0 L 1180 393.0 L 1100 393.0" class="rel-line"/>
+<circle cx="1260" cy="367.0" r="3.2" class="rel-dot"/>
+<circle cx="1100" cy="393.0" r="3.2" class="rel-dot"/>
+<text x="1252.0" y="361.0" class="rel-label">1</text>
+<text x="1120.0" y="387.0" class="rel-label">N</text>
+<rect x="1170.2" y="351.0" width="67.6" height="16" class="mid-label-bg"/>
+<text x="1204.0" y="363.0" text-anchor="middle" class="mid-label">genre_id</text>
+<g class="table">
+<rect x="40" y="40" width="320" height="164" rx="8" class="table-box"/>
+<path d="M 40 48 a 8 8 0 0 1 8 -8 h 304 a 8 8 0 0 1 8 8 v 26 h -320 z" class="table-header"/>
+<text x="200.0" y="62.0" text-anchor="middle" class="table-title">users</text>
+<text x="52" y="91.0" class="col-pk">user_id</text>
+<text x="348" y="91.0" text-anchor="end" class="col-type">PK</text>
+<rect x="41" y="100" width="318" height="26" class="row-alt"/>
+<text x="52" y="117.0" class="col-name">email</text>
+<text x="348" y="117.0" text-anchor="end" class="col-type">VARCHAR, UNIQUE, NOT NULL</text>
+<text x="52" y="143.0" class="col-name">login</text>
+<text x="348" y="143.0" text-anchor="end" class="col-type">VARCHAR, UNIQUE, NOT NULL</text>
+<rect x="41" y="152" width="318" height="26" class="row-alt"/>
+<text x="52" y="169.0" class="col-name">name</text>
+<text x="348" y="169.0" text-anchor="end" class="col-type">VARCHAR</text>
+<text x="52" y="195.0" class="col-name">birthday</text>
+<text x="348" y="195.0" text-anchor="end" class="col-type">DATE</text>
+<line x1="40" y1="74" x2="360" y2="74" class="header-rule"/>
+</g><g class="table">
+<rect x="40" y="320" width="320" height="112" rx="8" class="table-box"/>
+<path d="M 40 328 a 8 8 0 0 1 8 -8 h 304 a 8 8 0 0 1 8 8 v 26 h -320 z" class="table-header"/>
+<text x="200.0" y="342.0" text-anchor="middle" class="table-title">friendship</text>
+<text x="52" y="371.0" class="col-pk">user_id</text>
+<text x="348" y="371.0" text-anchor="end" class="col-type">PK, FK</text>
+<rect x="41" y="380" width="318" height="26" class="row-alt"/>
+<text x="52" y="397.0" class="col-pk">friend_id</text>
+<text x="348" y="397.0" text-anchor="end" class="col-type">PK, FK</text>
+<text x="52" y="423.0" class="col-name">status_id</text>
+<text x="348" y="423.0" text-anchor="end" class="col-type">FK</text>
+<line x1="40" y1="354" x2="360" y2="354" class="header-rule"/>
+</g><g class="table">
+<rect x="40" y="590" width="320" height="86" rx="8" class="table-box"/>
+<path d="M 40 598 a 8 8 0 0 1 8 -8 h 304 a 8 8 0 0 1 8 8 v 26 h -320 z" class="table-header"/>
+<text x="200.0" y="612.0" text-anchor="middle" class="table-title">friendship_statuses</text>
+<text x="52" y="641.0" class="col-pk">status_id</text>
+<text x="348" y="641.0" text-anchor="end" class="col-type">PK</text>
+<rect x="41" y="650" width="318" height="26" class="row-alt"/>
+<text x="52" y="667.0" class="col-name">name</text>
+<text x="348" y="667.0" text-anchor="end" class="col-type">VARCHAR, UNIQUE, NOT NULL</text>
+<line x1="40" y1="624" x2="360" y2="624" class="header-rule"/>
+</g><g class="table">
+<rect x="440" y="320" width="260" height="86" rx="8" class="table-box"/>
+<path d="M 440 328 a 8 8 0 0 1 8 -8 h 244 a 8 8 0 0 1 8 8 v 26 h -260 z" class="table-header"/>
+<text x="570.0" y="342.0" text-anchor="middle" class="table-title">likes</text>
+<text x="452" y="371.0" class="col-pk">film_id</text>
+<text x="688" y="371.0" text-anchor="end" class="col-type">PK, FK</text>
+<rect x="441" y="380" width="258" height="26" class="row-alt"/>
+<text x="452" y="397.0" class="col-pk">user_id</text>
+<text x="688" y="397.0" text-anchor="end" class="col-type">PK, FK</text>
+<line x1="440" y1="354" x2="700" y2="354" class="header-rule"/>
+</g><g class="table">
+<rect x="780" y="40" width="320" height="190" rx="8" class="table-box"/>
+<path d="M 780 48 a 8 8 0 0 1 8 -8 h 304 a 8 8 0 0 1 8 8 v 26 h -320 z" class="table-header"/>
+<text x="940.0" y="62.0" text-anchor="middle" class="table-title">films</text>
+<text x="792" y="91.0" class="col-pk">film_id</text>
+<text x="1088" y="91.0" text-anchor="end" class="col-type">PK</text>
+<rect x="781" y="100" width="318" height="26" class="row-alt"/>
+<text x="792" y="117.0" class="col-name">name</text>
+<text x="1088" y="117.0" text-anchor="end" class="col-type">VARCHAR, NOT NULL</text>
+<text x="792" y="143.0" class="col-name">description</text>
+<text x="1088" y="143.0" text-anchor="end" class="col-type">VARCHAR(200)</text>
+<rect x="781" y="152" width="318" height="26" class="row-alt"/>
+<text x="792" y="169.0" class="col-name">release_date</text>
+<text x="1088" y="169.0" text-anchor="end" class="col-type">DATE</text>
+<text x="792" y="195.0" class="col-name">duration</text>
+<text x="1088" y="195.0" text-anchor="end" class="col-type">INT</text>
+<rect x="781" y="204" width="318" height="26" class="row-alt"/>
+<text x="792" y="221.0" class="col-name">mpa_id</text>
+<text x="1088" y="221.0" text-anchor="end" class="col-type">FK</text>
+<line x1="780" y1="74" x2="1100" y2="74" class="header-rule"/>
+</g><g class="table">
+<rect x="1260" y="40" width="260" height="86" rx="8" class="table-box"/>
+<path d="M 1260 48 a 8 8 0 0 1 8 -8 h 244 a 8 8 0 0 1 8 8 v 26 h -260 z" class="table-header"/>
+<text x="1390.0" y="62.0" text-anchor="middle" class="table-title">mpa_ratings</text>
+<text x="1272" y="91.0" class="col-pk">mpa_id</text>
+<text x="1508" y="91.0" text-anchor="end" class="col-type">PK</text>
+<rect x="1261" y="100" width="258" height="26" class="row-alt"/>
+<text x="1272" y="117.0" class="col-name">name</text>
+<text x="1508" y="117.0" text-anchor="end" class="col-type">VARCHAR, UNIQUE, NOT NULL</text>
+<line x1="1260" y1="74" x2="1520" y2="74" class="header-rule"/>
+</g><g class="table">
+<rect x="1260" y="320" width="260" height="86" rx="8" class="table-box"/>
+<path d="M 1260 328 a 8 8 0 0 1 8 -8 h 244 a 8 8 0 0 1 8 8 v 26 h -260 z" class="table-header"/>
+<text x="1390.0" y="342.0" text-anchor="middle" class="table-title">genres</text>
+<text x="1272" y="371.0" class="col-pk">genre_id</text>
+<text x="1508" y="371.0" text-anchor="end" class="col-type">PK</text>
+<rect x="1261" y="380" width="258" height="26" class="row-alt"/>
+<text x="1272" y="397.0" class="col-name">name</text>
+<text x="1508" y="397.0" text-anchor="end" class="col-type">VARCHAR, UNIQUE, NOT NULL</text>
+<line x1="1260" y1="354" x2="1520" y2="354" class="header-rule"/>
+</g><g class="table">
+<rect x="780" y="320" width="320" height="86" rx="8" class="table-box"/>
+<path d="M 780 328 a 8 8 0 0 1 8 -8 h 304 a 8 8 0 0 1 8 8 v 26 h -320 z" class="table-header"/>
+<text x="940.0" y="342.0" text-anchor="middle" class="table-title">film_genres</text>
+<text x="792" y="371.0" class="col-pk">film_id</text>
+<text x="1088" y="371.0" text-anchor="end" class="col-type">PK, FK</text>
+<rect x="781" y="380" width="318" height="26" class="row-alt"/>
+<text x="792" y="397.0" class="col-pk">genre_id</text>
+<text x="1088" y="397.0" text-anchor="end" class="col-type">PK, FK</text>
+<line x1="780" y1="354" x2="1100" y2="354" class="header-rule"/>
+</g>
+</svg>
