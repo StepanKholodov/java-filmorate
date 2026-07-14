@@ -9,13 +9,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Модель данных фильма.
  * Базовые ограничения полей описаны через аннотации Jakarta Bean Validation
  * и проверяются автоматически при использовании {@code @Valid} в контроллере.
  * Дополнительное ограничение «дата релиза не раньше 28 декабря 1895 года»
- * валидируется отдельно в {@link ru.yandex.practicum.filmorate.controller.FilmController}.
+ * проверяется в {@link ru.yandex.practicum.filmorate.service.FilmService}.
  * Равенство и хеш-код вычисляются только по идентификатору, чтобы изменение
  * изменяемых полей не нарушало работу с фильмом в коллекциях на основе хеша.
  */
@@ -52,4 +54,11 @@ public class Film {
     @NotNull(message = "продолжительность фильма должна быть указана")
     @Positive(message = "продолжительность фильма должна быть положительным числом")
     private Integer duration;
+
+    /**
+     * Идентификаторы пользователей, поставивших фильму лайк.
+     * Использование множества гарантирует, что один пользователь не может лайкнуть фильм дважды.
+     */
+    private final Set<Long> likes = new HashSet<>();
+
 }

@@ -1,124 +1,143 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
 
 /**
  * REST-контроллер для работы с пользователями.
- * Поддерживает операции получения списка, создания и обновления.
- * Валидация полей выполняется аннотациями Jakarta Bean Validation на модели
- * {@link User} при использовании {@code @Valid}; контроллер дополнительно
- * подставляет логин в качестве имени, если имя пустое.
- * Данные хранятся в памяти приложения.
+ * Принимает HTTP-запросы по пути {@code /users}, выполняет валидацию входных данных
+ * аннотацией {@link Valid} и делегирует всю бизнес-логику в {@link UserService}.
  */
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     /**
-     * Хранилище пользователей в памяти приложения, ключ — идентификатор пользователя.
+     * Сервис, реализующий операции над пользователями и связями дружбы.
      */
-    private final Map<Long, User> users = new HashMap<>();
+    private final UserService userService;
 
     /**
-     * Счётчик для выдачи уникальных идентификаторов пользователей.
-     */
-    private final AtomicLong idCounter = new AtomicLong(0);
-
-    /**
-     * Возвращает всех зарегистрированных пользователей.
+     * Возвращает всех пользователей, зарегистрированных в приложении.
      *
-     * @return коллекция всех пользователей
+     * @return коллекция всех пользователей (может быть пустой)
      */
     @GetMapping
     public Collection<User> findAll() {
-        log.info("Вызван метод для получения всех пользователей");
-        return users.values();
+        log.info("GET /users");
+        return userService.getAll();
     }
 
     /**
-     * Создаёт нового пользователя. Поля проверяются Bean Validation;
-     * если имя не задано — используется логин. Идентификатор присваивается автоматически.
+     * Возвращает пользователя по его уникальному идентификатору.
      *
-     * @param newUser данные нового пользователя
-     * @return созданный пользователь с присвоенным идентификатором
+     * @param id идентификатор пользователя
+     * @return найденный пользователь
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если пользователь не найден
+     */
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable long id) {
+        log.info("GET /users/{}", id);
+        return userService.getById(id);
+    }
+
+    /**
+     * Создаёт нового пользователя. Идентификатор присваивается автоматически.
+     * Если поле {@code name} пустое, в качестве имени используется {@code login}.
+     *
+     * @param newUser данные нового пользователя; проходят Bean Validation
+     * @return созданный пользователь с присвоенным {@code id}
      */
     @PostMapping
     public User create(@Valid @RequestBody User newUser) {
-        log.info("Вызван метод для создания пользователя: {}", newUser);
-        useLoginAsNameIfBlank(newUser);
-
-        newUser.setId(getNextId());
-        users.put(newUser.getId(), newUser);
-        log.info("Пользователь создан с id = {}", newUser.getId());
-
-        return newUser;
+        log.info("POST /users {}", newUser);
+        User created = userService.create(newUser);
+        log.info("Пользователь создан с id = {}", created.getId());
+        return created;
     }
 
     /**
-     * Обновляет данные существующего пользователя. Поля проверяются Bean Validation;
-     * если имя не задано — используется логин. Требуется указание id.
+     * Обновляет существующего пользователя. Идентификатор пользователя обязателен.
+     * Ранее добавленные друзья сохраняются.
      *
-     * @param newUser обновлённые данные пользователя
+     * @param newUser данные пользователя с указанным {@code id}
      * @return обновлённый пользователь
-     * @throws ValidateException если не указан id
-     * @throws NotFoundException если пользователя с переданным id не существует
+     * @throws ru.yandex.practicum.filmorate.exception.ValidateException если {@code id} не задан
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если пользователь с указанным {@code id} не найден
      */
     @PutMapping
     public User update(@Valid @RequestBody User newUser) {
-        log.info("Вызван метод для обновления пользователя: {}", newUser);
-        if (newUser.getId() == null) {
-            log.warn("Ошибка обновления пользователя: id не указан");
-            throw new ValidateException("id должен быть указан");
-        }
-
-        if (!users.containsKey(newUser.getId())) {
-            log.warn("Пользователь с id = {} не найден", newUser.getId());
-            throw new NotFoundException("пользователь с id = " + newUser.getId() + " не найден");
-        }
-
-        useLoginAsNameIfBlank(newUser);
-        users.put(newUser.getId(), newUser);
-        log.info("Пользователь с id = {} обновлён", newUser.getId());
-
-        return newUser;
+        log.info("PUT /users {}", newUser);
+        return userService.update(newUser);
     }
 
     /**
-     * Если у пользователя не задано имя для отображения,
-     * подставляет в него логин.
+     * Добавляет двустороннюю связь дружбы между двумя пользователями.
+     * Подтверждение со стороны второго пользователя не требуется.
      *
-     * @param user пользователь, у которого может быть пустое имя
+     * @param id       идентификатор первого пользователя
+     * @param friendId идентификатор второго пользователя
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
      */
-    private void useLoginAsNameIfBlank(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.info("Имя пустое, используется логин: {}", user.getLogin());
-            user.setName(user.getLogin());
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info("PUT /users/{}/friends/{}", id, friendId);
+        userService.addFriend(id, friendId);
     }
 
     /**
-     * Генерирует следующий уникальный идентификатор пользователя
-     * с помощью атомарного счётчика.
+     * Удаляет связь дружбы между двумя пользователями у обеих сторон.
      *
-     * @return новый уникальный идентификатор
+     * @param id       идентификатор первого пользователя
+     * @param friendId идентификатор второго пользователя
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
      */
-    private long getNextId() {
-        return idCounter.incrementAndGet();
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info("DELETE /users/{}/friends/{}", id, friendId);
+        userService.removeFriend(id, friendId);
+    }
+
+    /**
+     * Возвращает список друзей указанного пользователя.
+     *
+     * @param id идентификатор пользователя
+     * @return список друзей (может быть пустым)
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если пользователь не найден
+     */
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable long id) {
+        log.info("GET /users/{}/friends", id);
+        return userService.getFriends(id);
+    }
+
+    /**
+     * Возвращает список общих друзей двух пользователей.
+     *
+     * @param id      идентификатор первого пользователя
+     * @param otherId идентификатор второго пользователя
+     * @return список общих друзей (может быть пустым)
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
+     */
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        log.info("GET /users/{}/friends/common/{}", id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }
