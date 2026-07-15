@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 
@@ -112,12 +113,32 @@ class FilmValidationTest {
         assertViolationOn(film, "duration");
     }
 
+    @Test
+    @DisplayName("Возрастной рейтинг null → нарушение @NotNull")
+    void nullMpaRatingTriggersViolation() {
+        Film film = validFilm();
+        film.setMpa(null);
+        assertViolationOn(film, "mpa");
+    }
+
+    @Test
+    @DisplayName("Возрастной рейтинг без id → нарушение @NotNull на вложенном поле")
+    void mpaWithoutIdTriggersViolation() {
+        Film film = validFilm();
+        film.setMpa(new Mpa());
+        assertViolationOn(film, "mpa.id");
+    }
+
     private Film validFilm() {
         Film film = new Film();
         film.setName("Inception");
         film.setDescription("Short");
         film.setReleaseDate(LocalDate.of(2010, 7, 16));
         film.setDuration(148);
+        Mpa mpa = new Mpa();
+        mpa.setId(3L);
+        mpa.setName("PG-13");
+        film.setMpa(mpa);
         return film;
     }
 

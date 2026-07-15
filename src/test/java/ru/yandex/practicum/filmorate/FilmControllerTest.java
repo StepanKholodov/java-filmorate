@@ -7,9 +7,12 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.InMemoryGenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.InMemoryMpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
@@ -34,7 +37,8 @@ class FilmControllerTest {
     void setUp() {
         InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
-        FilmService filmService = new FilmService(filmStorage, userStorage);
+        FilmService filmService = new FilmService(filmStorage, userStorage,
+                new InMemoryGenreStorage(), new InMemoryMpaStorage());
         controller = new FilmController(filmService);
     }
 
@@ -218,6 +222,9 @@ class FilmControllerTest {
         film.setDescription("A mind-bending thriller");
         film.setReleaseDate(LocalDate.of(2010, 7, 16));
         film.setDuration(148);
+        Mpa mpa = new Mpa();
+        mpa.setId(3L);
+        film.setMpa(mpa);
         return film;
     }
 

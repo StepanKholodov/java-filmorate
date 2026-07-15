@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -10,6 +12,7 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -54,6 +57,24 @@ public class Film {
     @NotNull(message = "продолжительность фильма должна быть указана")
     @Positive(message = "продолжительность фильма должна быть положительным числом")
     private Integer duration;
+
+    /**
+     * Жанры фильма; у одного фильма может быть несколько жанров.
+     * Для создания/обновления достаточно указать {@code id} каждого жанра —
+     * название сервис подставит самостоятельно из справочника.
+     */
+    @Valid
+    @JsonDeserialize(as = LinkedHashSet.class)
+    private final Set<Genre> genres = new LinkedHashSet<>();
+
+    /**
+     * Возрастной рейтинг фильма (MPA), определяющий ограничение по возрасту.
+     * Для создания/обновления достаточно указать {@code id} рейтинга —
+     * название сервис подставит самостоятельно из справочника.
+     */
+    @NotNull(message = "возрастной рейтинг должен быть указан")
+    @Valid
+    private Mpa mpa;
 
     /**
      * Идентификаторы пользователей, поставивших фильму лайк.

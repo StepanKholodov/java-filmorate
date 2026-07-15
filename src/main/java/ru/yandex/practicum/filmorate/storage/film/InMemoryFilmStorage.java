@@ -1,15 +1,19 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * Реализация {@link FilmStorage}, хранящая фильмы в оперативной памяти приложения.
@@ -17,7 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Подходит для разработки и тестов; данные не сохраняются между перезапусками.
  */
 @Slf4j
-@Component
+@Component("inMemoryFilmStorage")
+@Qualifier("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
     /**
@@ -97,6 +102,33 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Фильм с id = {} обновлён", film.getId());
 
         return film;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        findById(filmId).getLikes().add(userId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeLike(Long filmId, Long userId) {
+        findById(filmId).getLikes().remove(userId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Film> getPopular(int count) {
+        return films.values().stream()
+                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     /**

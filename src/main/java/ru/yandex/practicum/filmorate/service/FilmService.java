@@ -2,25 +2,29 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * Сервис, инкапсулирующий бизнес-логику над фильмами:
  * создание и обновление с дополнительной валидацией даты релиза,
  * управление лайками и формирование рейтинга популярных фильмов.
- * Зависит от абстракций {@link FilmStorage} и {@link UserStorage},
- * чтобы реализацию хранения можно было заменить без правок сервиса.
+ * Зависит от абстракций {@link FilmStorage}, {@link UserStorage}, {@link GenreStorage}
+ * и {@link MpaStorage}, чтобы реализацию хранения можно было заменить без правок сервиса.
  */
 @Slf4j
 @Service
@@ -35,13 +39,27 @@ public class FilmService {
     /**
      * Хранилище фильмов, через которое выполняются все операции чтения и записи.
      */
+    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
 
     /**
      * Хранилище пользователей; используется для проверки существования
      * пользователя при операциях с лайками.
      */
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+
+    /**
+     * Хранилище жанров; используется для подстановки полных данных жанра по его id.
+     */
+    @Qualifier("genreDbStorage")
+    private final GenreStorage genreStorage;
+
+    /**
+     * Хранилище рейтингов MPA; используется для подстановки полных данных рейтинга по его id.
+     */
+    @Qualifier("mpaDbStorage")
+    private final MpaStorage mpaStorage;
 
     /**
      * Возвращает все фильмы, хранящиеся в приложении.
@@ -64,14 +82,18 @@ public class FilmService {
     }
 
     /**
-     * Создаёт новый фильм после проверки даты релиза.
+     * Создаёт новый фильм после проверки даты релиза. Жанры и рейтинг
+     * должны существовать в соответствующих справочниках — из запроса
+     * достаточно передать их идентификаторы, названия подставляются сервисом.
      *
      * @param film данные нового фильма
      * @return созданный фильм с присвоенным идентификатором
      * @throws ValidateException если дата релиза раньше {@link #BIRTH_OF_CINEMA}
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если жанр или рейтинг не найдены
      */
     public Film create(Film film) {
         validateReleaseDate(film);
+        resolveMpaAndGenres(film);
         return filmStorage.add(film);
     }
 
@@ -81,25 +103,25 @@ public class FilmService {
      * @param film данные фильма с указанным {@code id}
      * @return обновлённый фильм
      * @throws ValidateException если дата релиза некорректна или {@code id} не задан
-     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если фильм с указанным {@code id} не найден
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если фильм, жанр или рейтинг не найдены
      */
     public Film update(Film film) {
         validateReleaseDate(film);
+        resolveMpaAndGenres(film);
         return filmStorage.modify(film);
     }
 
     /**
      * Добавляет лайк фильму от указанного пользователя.
-     * Повторный лайк не дублируется за счёт использования множества.
+     * Повторный лайк не дублируется.
      *
      * @param filmId идентификатор фильма
      * @param userId идентификатор пользователя
      * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если фильм или пользователь не найдены
      */
     public void addLike(long filmId, long userId) {
-        Film film = filmStorage.findById(filmId);
         userStorage.findById(userId);
-        film.getLikes().add(userId);
+        filmStorage.addLike(filmId, userId);
         log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
     }
 
@@ -111,9 +133,8 @@ public class FilmService {
      * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если фильм или пользователь не найдены
      */
     public void removeLike(long filmId, long userId) {
-        Film film = filmStorage.findById(filmId);
         userStorage.findById(userId);
-        film.getLikes().remove(userId);
+        filmStorage.removeLike(filmId, userId);
         log.info("Пользователь {} убрал лайк с фильма {}", userId, filmId);
     }
 
@@ -128,10 +149,7 @@ public class FilmService {
         if (count <= 0) {
             throw new ValidateException("count должен быть положительным числом");
         }
-        return filmStorage.getAll().stream()
-                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopular(count);
     }
 
     /**
@@ -147,5 +165,21 @@ public class FilmService {
             log.warn("Ошибка валидации: некорректная дата релиза {}", film.getReleaseDate());
             throw new ValidateException("дата релиза не может быть раньше 28 декабря 1895 года");
         }
+    }
+
+    /**
+     * Подставляет в фильм полные данные рейтинга и жанров (с названиями),
+     * найденные по идентификаторам, переданным в запросе.
+     *
+     * @param film фильм, у которого заполнены только идентификаторы рейтинга/жанров
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если рейтинг или какой-то из жанров не найден
+     */
+    private void resolveMpaAndGenres(Film film) {
+        film.setMpa(mpaStorage.findById(film.getMpa().getId()));
+
+        List<Long> genreIds = film.getGenres().stream().map(Genre::getId).distinct().toList();
+        Set<Genre> resolvedGenres = new LinkedHashSet<>(genreStorage.findAllByIds(genreIds));
+        film.getGenres().clear();
+        film.getGenres().addAll(resolvedGenres);
     }
 }

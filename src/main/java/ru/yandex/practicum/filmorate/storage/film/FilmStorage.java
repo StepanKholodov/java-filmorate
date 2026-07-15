@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Контракт хранилища фильмов.
@@ -52,4 +53,32 @@ public interface FilmStorage {
      * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если фильм не найден
      */
     Film findById(Long id);
+
+    /**
+     * Добавляет лайк фильму от указанного пользователя.
+     *
+     * @param filmId идентификатор фильма
+     * @param userId идентификатор пользователя, ставящего лайк
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если фильм не найден
+     */
+    void addLike(Long filmId, Long userId);
+
+    /**
+     * Удаляет ранее поставленный лайк пользователя с фильма.
+     *
+     * @param filmId идентификатор фильма
+     * @param userId идентификатор пользователя, снимающего лайк
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если фильм не найден
+     */
+    void removeLike(Long filmId, Long userId);
+
+    /**
+     * Возвращает не более {@code count} самых популярных фильмов по убыванию числа лайков.
+     * Сортировка и ограничение выполняются в самом хранилище, а не в вызывающем коде,
+     * чтобы для больших коллекций не приходилось поднимать в память все фильмы ради топ-N.
+     *
+     * @param count максимальное число фильмов в результате
+     * @return список фильмов размером не более {@code count}
+     */
+    List<Film> getPopular(int count);
 }

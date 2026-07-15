@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Контракт хранилища пользователей.
@@ -53,4 +54,33 @@ public interface UserStorage {
      * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если пользователь не найден
      */
     User findById(Long id);
+
+    /**
+     * Добавляет пользователя {@code friendId} в список друзей пользователя {@code userId}.
+     * Связь односторонняя: у {@code friendId} пользователь {@code userId} в друзья не добавляется.
+     *
+     * @param userId   идентификатор пользователя, инициирующего добавление
+     * @param friendId идентификатор добавляемого в друзья пользователя
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
+     */
+    void addFriend(Long userId, Long friendId);
+
+    /**
+     * Удаляет пользователя {@code friendId} из списка друзей пользователя {@code userId}.
+     *
+     * @param userId   идентификатор пользователя, из чьего списка удаляют друга
+     * @param friendId идентификатор удаляемого из друзей пользователя
+     * @throws ru.yandex.practicum.filmorate.exception.NotFoundException если кто-то из пользователей не найден
+     */
+    void removeFriend(Long userId, Long friendId);
+
+    /**
+     * Возвращает пользователей по набору идентификаторов одним обращением к хранилищу,
+     * вместо поочерёдного вызова {@link #findById(Long)} для каждого идентификатора.
+     * Идентификаторы, для которых пользователь не найден, в результате просто отсутствуют.
+     *
+     * @param ids идентификаторы искомых пользователей
+     * @return найденные пользователи (порядок не гарантирован)
+     */
+    List<User> findAllByIds(Collection<Long> ids);
 }
