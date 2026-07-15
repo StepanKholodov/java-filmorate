@@ -58,7 +58,7 @@ public class GenreDbStorage implements GenreStorage {
             return List.of();
         }
         String placeholders = String.join(",", Collections.nCopies(ids.size(), "?"));
-        String sql = "SELECT * FROM genres WHERE genre_id IN (" + placeholders + ")";
+        String sql = "SELECT * FROM genres WHERE genre_id IN (" + placeholders + ") ORDER BY genre_id";
         List<Genre> found = jdbcTemplate.query(sql, new GenreRowMapper(), ids.toArray());
 
         Map<Long, Genre> byId = new LinkedHashMap<>();

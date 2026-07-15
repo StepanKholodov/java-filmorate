@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -63,6 +64,7 @@ public class Film {
      * название сервис подставит самостоятельно из справочника.
      */
     @Valid
+    @JsonDeserialize(as = LinkedHashSet.class)
     private final Set<Genre> genres = new LinkedHashSet<>();
 
     /**
