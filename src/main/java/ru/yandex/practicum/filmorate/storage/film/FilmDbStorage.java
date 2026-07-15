@@ -82,11 +82,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(keyHolder.getKey().longValue());
         saveGenres(film);
         log.info("Фильм добавлен с id = {}", film.getId());
-        Film created = queryFilmById(film.getId());
-        created.getGenres().addAll(
-                findGenresByFilmIds(List.of(film.getId())).getOrDefault(film.getId(), List.of()));
-        // лайков у только что созданного фильма быть не может — запрос к таблице likes не нужен
-        return created;
+        return film;
     }
 
     /**

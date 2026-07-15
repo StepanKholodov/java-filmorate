@@ -61,17 +61,33 @@ class FilmDbStorageTest {
         return mpa;
     }
 
+    private Mpa mpaRef(long id, String name) {
+        Mpa mpa = mpaRef(id);
+        mpa.setName(name);
+        return mpa;
+    }
+
     private Genre genreRef(long id) {
         Genre genre = new Genre();
         genre.setId(id);
         return genre;
     }
 
+    private Genre genreRef(long id, String name) {
+        Genre genre = genreRef(id);
+        genre.setName(name);
+        return genre;
+    }
+
     @Test
     void addAssignsIdAndPersistsFilmWithMpaAndGenres() {
+        // storage.add() больше не обогащает mpa/жанры запросом к БД — их (с именами)
+        // подставляет FilmService.resolveMpaAndGenres до вызова storage, поэтому здесь
+        // передаём уже разрешённые значения, как это делает сервис
         Film film = newFilm("Inception");
-        film.getGenres().add(genreRef(4L));
-        film.getGenres().add(genreRef(6L));
+        film.setMpa(mpaRef(3L, "PG-13"));
+        film.getGenres().add(genreRef(4L, "Триллер"));
+        film.getGenres().add(genreRef(6L, "Боевик"));
 
         Film created = filmStorage.add(film);
 
